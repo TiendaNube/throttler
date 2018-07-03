@@ -1,0 +1,14 @@
+{
+    "name": "tiendanube/throttler",
+    "description": "A PHP package for throttling and rate limiting",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lucas Mendes",
+            "email": "devsdmf@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
