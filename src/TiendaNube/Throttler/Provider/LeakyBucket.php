@@ -132,7 +132,7 @@ class LeakyBucket implements ProviderInterface
      */
     public function getEstimate(string $namespace): int
     {
-        return 1000 / $this->leakRate;
+        return intval(ceil(1000 / $this->leakRate));
     }
 
     /**
