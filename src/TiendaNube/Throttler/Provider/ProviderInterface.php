@@ -2,6 +2,9 @@
 
 namespace TiendaNube\Throttler\Provider;
 
+use TiendaNube\Throttler\Exception\LeakyBucketException;
+use TiendaNube\Throttler\Exception\ProviderException;
+use TiendaNube\Throttler\Exception\StorageNotDefinedException;
 use TiendaNube\Throttler\Storage\StorageInterface;
 
 /**
@@ -29,7 +32,8 @@ interface ProviderInterface
     /**
      * Get the current storage adapter.
      *
-     * @return null|StorageInterface
+     * @throws StorageNotDefinedException
+     * @return StorageInterface
      */
     public function getStorage();
 
@@ -38,6 +42,7 @@ interface ProviderInterface
      *
      * @param string $namespace
      * @param int $count
+     * @throws ProviderException
      * @return int
      */
     public function incrementUsage(string $namespace, int $count = 1): int;
@@ -55,6 +60,7 @@ interface ProviderInterface
      * Get the current request usage number.
      *
      * @param string $namespace
+     * @throws ProviderException
      * @return int
      */
     public function getUsage(string $namespace): int;
@@ -63,6 +69,7 @@ interface ProviderInterface
      * Get the request limit number.
      *
      * @param string $namespace
+     * @throws ProviderException
      * @return int
      */
     public function getLimit(string $namespace): int;
@@ -71,6 +78,7 @@ interface ProviderInterface
      * Checks if there is limit to perform a request.
      *
      * @param string $namespace
+     * @throws ProviderException
      * @return bool
      */
     public function hasLimit(string $namespace): bool;
@@ -79,6 +87,7 @@ interface ProviderInterface
      * Get the number of remaining requests before reach the limit.
      *
      * @param string $namespace
+     * @throws ProviderException
      * @return int
      */
     public function getRemaining(string $namespace): int;
@@ -87,6 +96,7 @@ interface ProviderInterface
      * Get the estimated time to perform the next request in milliseconds.
      *
      * @param string $namespace
+     * @throws ProviderException
      * @return int
      */
     public function getEstimate(string $namespace): int;
@@ -95,6 +105,7 @@ interface ProviderInterface
      * Get the time to fully reset the rate limit in milliseconds.
      *
      * @param string $namespace
+     * @throws ProviderException
      * @return int
      */
     public function getReset(string $namespace): int;

@@ -2,6 +2,8 @@
 
 namespace TiendaNube\Throttler\Provider;
 
+use TiendaNube\Throttler\Exception\LeakyBucketException;
+use TiendaNube\Throttler\Exception\StorageNotDefinedException;
 use TiendaNube\Throttler\Storage\StorageInterface;
 
 /**
@@ -44,14 +46,24 @@ class LeakyBucket implements ProviderInterface
      * @param int $capacity
      * @param float $leakRate
      * @param StorageInterface|null $storage
+     * @throws LeakyBucketException
      */
     public function __construct(
         int $capacity = self::DEFAULT_CAPACITY,
         float $leakRate = self::DEFAULT_LEAK_RATE,
         StorageInterface $storage = null
     ) {
-        $this->capacity = $capacity;
-        $this->leakRate = $leakRate;
+        if ($capacity >= 0) {
+            $this->capacity = $capacity;
+        } else {
+            throw new LeakyBucketException('The bucket capacity cannot be a negative number.');
+        }
+
+        if ($leakRate > 0) {
+            $this->leakRate = $leakRate;
+        } else {
+            throw new LeakyBucketException('The bucket leak rate should be greater than zero.');
+        }
 
         if (!is_null($storage)) {
             $this->setStorage($storage);
@@ -71,6 +83,10 @@ class LeakyBucket implements ProviderInterface
      */
     public function getStorage()
     {
+        if (is_null($this->storage)) {
+            throw new StorageNotDefinedException('You must define an storage adapter');
+        }
+
         return $this->storage;
     }
 
@@ -155,30 +171,45 @@ class LeakyBucket implements ProviderInterface
      *
      * @param string $namespace
      * @param array $bucket
+     * @throws StorageNotDefinedException
      * @return bool
      */
     protected function saveBucket(string $namespace, array $bucket): bool
     {
+        $storage = $this->getStorage();
+
         $serializedBucket = serialize($bucket);
-        if ($this->storage->hasItem($namespace)) {
-            return $this->storage->replaceItem($namespace,$serializedBucket);
+        if ($storage->hasItem($namespace)) {
+            return $storage->replaceItem($namespace,$serializedBucket);
         }
 
-        return $this->storage->setItem($namespace,$serializedBucket);
+        return $storage->setItem($namespace,$serializedBucket);
     }
 
     /**
      * Get the bucket from the storage.
      *
      * @param string $namespace
+     * @throws StorageNotDefinedException
+     * @throws LeakyBucketException
      * @return array
      */
     protected function getBucket(string $namespace): array
     {
-        if ($this->storage->hasItem($namespace)) {
-            $bucket = unserialize($this->storage->getItem($namespace));
+        $storage = $this->getStorage();
+
+        if ($storage->hasItem($namespace)) {
+            $bucket = unserialize($storage->getItem($namespace));
+
             $leakedBucket = $this->leakBucket($bucket);
-            return $leakedBucket;
+
+            if ($this->saveBucket($namespace,$leakedBucket)) {
+                return $leakedBucket;
+            } else {
+                throw new LeakyBucketException(
+                    'An error occurred at try to save the leaked bucket in the storage'
+                );
+            }
         }
 
         return $this->getEmptyBucket();
