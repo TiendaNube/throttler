@@ -8,8 +8,9 @@ interface StorageInterface
      * Sets the storage options.
      *
      * @param array $options
+     * @return void
      */
-    public function setOptions(array $options): void;
+    public function setOptions(array $options);
 
     /**
      * Get the current storage options.

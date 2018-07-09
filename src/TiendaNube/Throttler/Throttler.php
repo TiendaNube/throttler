@@ -64,9 +64,9 @@ class Throttler
      *
      * @param string $namespace
      * @param int $factor
-     * @return int|mixed
+     * @return int
      */
-    public function getRatio(string $namespace, int $factor = ProviderInterface::RATIO_FACTOR_BY_SECOND)
+    public function getRatio(string $namespace, int $factor = ProviderInterface::RATIO_FACTOR_BY_SECOND): int
     {
         return $this->provider->getRatio($namespace,$factor);
     }
@@ -77,7 +77,7 @@ class Throttler
      * @param string $namespace
      * @return int
      */
-    public function getUsage(string $namespace)
+    public function getUsage(string $namespace): int
     {
         return $this->provider->getUsage($namespace);
     }
@@ -88,7 +88,7 @@ class Throttler
      * @param string $namespace
      * @return int
      */
-    public function getLimit(string $namespace)
+    public function getLimit(string $namespace): int
     {
         return $this->provider->getLimit($namespace);
     }
@@ -99,7 +99,7 @@ class Throttler
      * @param string $namespace
      * @return bool
      */
-    public function hasLimit(string $namespace)
+    public function hasLimit(string $namespace): bool
     {
         return $this->provider->hasLimit($namespace);
     }
@@ -110,7 +110,7 @@ class Throttler
      * @param string $namespace
      * @return int
      */
-    public function getRemaining(string $namespace)
+    public function getRemaining(string $namespace): int
     {
         return $this->provider->getRemaining($namespace);
     }
@@ -121,7 +121,7 @@ class Throttler
      * @param string $namespace
      * @return int
      */
-    public function getEstimate(string $namespace)
+    public function getEstimate(string $namespace): int
     {
         return $this->provider->getEstimate($namespace);
     }
@@ -132,7 +132,7 @@ class Throttler
      * @param string $namespace
      * @return int
      */
-    public function getReset(string $namespace)
+    public function getReset(string $namespace): int
     {
         return $this->provider->getReset($namespace);
     }

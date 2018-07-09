@@ -24,14 +24,14 @@ interface ProviderInterface
      *
      * @param StorageInterface $storage
      */
-    public function setStorage(StorageInterface $storage): void;
+    public function setStorage(StorageInterface $storage);
 
     /**
      * Get the current storage adapter.
      *
      * @return null|StorageInterface
      */
-    public function getStorage(): ?StorageInterface;
+    public function getStorage();
 
     /**
      * Increment the request usage value and return the current usage number.
@@ -47,7 +47,7 @@ interface ProviderInterface
      *
      * @param string $namespace
      * @param int $factor
-     * @return mixed
+     * @return int
      */
     public function getRatio(string $namespace, int $factor = self::RATIO_FACTOR_BY_SECOND): int;
 
