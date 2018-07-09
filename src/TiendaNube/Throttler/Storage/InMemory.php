@@ -39,9 +39,8 @@ class InMemory implements StorageInterface
      */
     public function __construct(array $options = [])
     {
-        if (!is_null($options) && count($options) > 0) {
-            $this->setOptions($options);
-        }
+        $options = !is_null($options) && count($options) > 0 ? $options : [];
+        $this->setOptions($options);
     }
 
     /**
