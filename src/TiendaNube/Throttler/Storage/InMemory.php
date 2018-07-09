@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 namespace TiendaNube\Throttler\Storage;
+use TiendaNube\Throttler\Exception\StorageItemNotFoundException;
 
 /**
  * Class InMemory
@@ -121,7 +122,7 @@ class InMemory implements StorageInterface
             return true;
         }
 
-        return false;
+        throw new StorageItemNotFoundException('The requested item does not exists in storage');
     }
 
     /**
@@ -135,7 +136,7 @@ class InMemory implements StorageInterface
             return $this->replaceItem($key,$current['value']);
         }
 
-        return false;
+        throw new StorageItemNotFoundException('The requested item does not exists in storage');
     }
 
     /**
@@ -148,7 +149,7 @@ class InMemory implements StorageInterface
             return true;
         }
 
-        return false;
+        throw new StorageItemNotFoundException('The requested item does not exists in storage');
     }
 
     /**

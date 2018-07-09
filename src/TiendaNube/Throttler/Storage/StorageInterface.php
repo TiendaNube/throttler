@@ -2,6 +2,8 @@
 
 namespace TiendaNube\Throttler\Storage;
 
+use TiendaNube\Throttler\Exception\StorageItemNotFoundException;
+
 interface StorageInterface
 {
     /**
@@ -49,6 +51,7 @@ interface StorageInterface
      *
      * @param string $key
      * @param mixed $value
+     * @throws StorageItemNotFoundException
      * @return bool Returns true if the item was successfully replaced otherwise false
      */
     public function replaceItem(string $key, $value): bool;
@@ -57,6 +60,7 @@ interface StorageInterface
      * Resets an item TTL in the storage.
      *
      * @param string $key
+     * @throws StorageItemNotFoundException
      * @return bool Returns tru if the item timestamp was successfully touched otherwise false
      */
     public function touchItem(string $key): bool;
@@ -65,6 +69,7 @@ interface StorageInterface
      * Remove an item from the storage.
      *
      * @param string $key
+     * @throws StorageItemNotFoundException
      * @return bool Returns true if the item was successfully removed from the storage otherwise false
      */
     public function removeItem(string $key): bool;
