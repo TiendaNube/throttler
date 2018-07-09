@@ -46,7 +46,7 @@ class InMemory implements StorageInterface
     /**
      * {@inheritdoc}
      */
-    public function setOptions(array $options): void
+    public function setOptions(array $options)
     {
         $optionsDiff = array_intersect_key($options,$this->defaultOptions);
         $this->options = array_merge($this->defaultOptions,$optionsDiff);

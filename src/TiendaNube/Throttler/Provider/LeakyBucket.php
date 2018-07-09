@@ -61,7 +61,7 @@ class LeakyBucket implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function setStorage(StorageInterface $storage): void
+    public function setStorage(StorageInterface $storage)
     {
         $this->storage = $storage;
     }
@@ -69,7 +69,7 @@ class LeakyBucket implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getStorage(): ?StorageInterface
+    public function getStorage()
     {
         return $this->storage;
     }
