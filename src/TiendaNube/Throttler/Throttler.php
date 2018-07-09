@@ -2,8 +2,8 @@
 
 namespace TiendaNube\Throttler;
 
+use TiendaNube\Throttler\Exception\ProviderException;
 use TiendaNube\Throttler\Provider\ProviderInterface;
-use TiendaNube\Throttler\Storage\InMemory;
 use TiendaNube\Throttler\Storage\StorageInterface;
 
 /**
@@ -30,8 +30,7 @@ class Throttler
     {
         $this->provider = $provider;
 
-        if (is_null($provider->getStorage())) {
-            $storage = $storage ?: new InMemory();
+        if (!is_null($storage)) {
             $this->provider->setStorage($storage);
         }
     }
@@ -42,6 +41,7 @@ class Throttler
      * @param string $namespace
      * @param bool $sleep
      * @param int $increment
+     * @throws ProviderException
      * @return bool
      */
     public function throttle(string $namespace, bool $sleep = false, int $increment = 1): bool
@@ -75,6 +75,7 @@ class Throttler
      * Get the current usage.
      *
      * @param string $namespace
+     * @throws ProviderException
      * @return int
      */
     public function getUsage(string $namespace): int
@@ -86,6 +87,7 @@ class Throttler
      * Get the current limit.
      *
      * @param string $namespace
+     * @throws ProviderException
      * @return int
      */
     public function getLimit(string $namespace): int
@@ -97,6 +99,7 @@ class Throttler
      * Check if the current provider has limit.
      *
      * @param string $namespace
+     * @throws ProviderException
      * @return bool
      */
     public function hasLimit(string $namespace): bool
@@ -108,6 +111,7 @@ class Throttler
      * Get the number of remaining requests available.
      *
      * @param string $namespace
+     * @throws ProviderException
      * @return int
      */
     public function getRemaining(string $namespace): int
@@ -119,6 +123,7 @@ class Throttler
      * Get the estimated time (in milliseconds) to perform the next request.
      *
      * @param string $namespace
+     * @throws ProviderException
      * @return int
      */
     public function getEstimate(string $namespace): int
@@ -130,6 +135,7 @@ class Throttler
      * Get the estimated time (in milliseconds) to fully reset the bucket.
      *
      * @param string $namespace
+     * @throws ProviderException
      * @return int
      */
     public function getReset(string $namespace): int
