@@ -8,7 +8,7 @@ env:
   - TRAVIS_ENV=1
 
 before_script:
-  - composer install --dev
+  - composer install
 
 script:
   - phpunit --coverage-clover tests/coverage-clover.xml
