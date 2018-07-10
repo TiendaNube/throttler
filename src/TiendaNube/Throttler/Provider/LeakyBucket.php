@@ -53,10 +53,10 @@ class LeakyBucket implements ProviderInterface
         float $leakRate = self::DEFAULT_LEAK_RATE,
         StorageInterface $storage = null
     ) {
-        if ($capacity >= 0) {
+        if ($capacity > 0) {
             $this->capacity = $capacity;
         } else {
-            throw new LeakyBucketException('The bucket capacity cannot be a negative number.');
+            throw new LeakyBucketException('The bucket capacity should be greater than zero.');
         }
 
         if ($leakRate > 0) {
@@ -96,6 +96,18 @@ class LeakyBucket implements ProviderInterface
     public function incrementUsage(string $namespace, int $count = 1): int
     {
         $bucket = $this->getBucket($namespace);
+
+        $drops = $bucket['drops'];
+        $limit = $this->getLimit($namespace);
+
+        if (($drops + $count) > $limit) {
+            $exceeded = ($drops + $count) - $limit;
+            throw new LeakyBucketException(sprintf(
+                'Cannot increment bucket in %s drops, exceeded bucket capacity by %s',
+                $count, $exceeded
+            ));
+        }
+
         $filledBucket = $this->fillBucket($bucket,$count);
         $this->saveBucket($namespace,$filledBucket);
 
