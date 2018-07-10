@@ -29,7 +29,7 @@ class InMemory implements StorageInterface
      * @var array
      */
     private $defaultOptions = [
-        'ttl' => 300000, // 5 minutes in milliseconds
+        'ttl' => 10000, // 10 seconds in milliseconds
     ];
 
     /**
@@ -65,12 +65,8 @@ class InMemory implements StorageInterface
      */
     public function getItem(string $key)
     {
-        if ($this->hasItem($key)) {
-            $current = $this->items[$key];
-            return $current['value'];
-        }
-
-        return false;
+        $item = $this->internalGetItem($key);
+        return ($item) ? $item['value'] : false;
     }
 
     /**
@@ -78,20 +74,7 @@ class InMemory implements StorageInterface
      */
     public function hasItem(string $key): bool
     {
-        if (array_key_exists($key,$this->items)) {
-            $current = $this->items[$key];
-
-            $diff = microtime(true) - $current['timestamp'];
-            $ttlInMicroseconds = $this->options['ttl'] * 1000;
-
-            if ($diff > $ttlInMicroseconds) {
-                return true;
-            } else {
-                unset($this->items[$key]);
-            }
-        }
-
-        return false;
+        return $this->internalHasItem($key);
     }
 
     /**
@@ -99,10 +82,9 @@ class InMemory implements StorageInterface
      */
     public function setItem(string $key, $value): bool
     {
-        $current = $this->getItem($key);
-        $new = $this->getItemObject($value,($current) ? $current['timestamp'] : false);
-
-        $this->items[$key] = $new;
+        $current = $this->internalGetItem($key);
+        $item = $this->getItemObject($value,($current) ? $current['timestamp'] : false);
+        $this->internalSetItem($key,$item);
 
         return true;
     }
@@ -112,11 +94,11 @@ class InMemory implements StorageInterface
      */
     public function replaceItem(string $key, $value): bool
     {
-        $current = $this->getItem($key);
+        $current = $this->internalGetItem($key);
 
         if ($current) {
-            $new = $this->getItemObject($value);
-            $this->items[$key] = $new;
+            $item = $this->getItemObject($value);
+            $this->internalSetItem($key,$item);
 
             return true;
         }
@@ -129,7 +111,7 @@ class InMemory implements StorageInterface
      */
     public function touchItem(string $key): bool
     {
-        $current = $this->getItem($key);
+        $current = $this->internalGetItem($key);
 
         if ($current) {
             return $this->replaceItem($key,$current['value']);
@@ -143,12 +125,62 @@ class InMemory implements StorageInterface
      */
     public function removeItem(string $key): bool
     {
-        if ($this->hasItem($key)) {
+        if ($this->internalHasItem($key)) {
             unset($this->items[$key]);
             return true;
         }
 
         throw new StorageItemNotFoundException('The requested item does not exists in storage');
+    }
+
+    /**
+     * Get an item from the storage array if it was not expired
+     *
+     * @param string $key
+     * @return bool|mixed
+     */
+    private function internalGetItem(string $key)
+    {
+        if ($this->internalHasItem($key)) {
+            return $this->items[$key];
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if an item exists in the storage array and if it is not expired
+     *
+     * @param string $key
+     * @return bool
+     */
+    private function internalHasItem(string $key): bool
+    {
+        if (array_key_exists($key,$this->items)) {
+            $item = $this->items[$key];
+
+            $diff = (microtime(true) - $item['timestamp']) * 1000; // time difference in milliseconds
+            $ttl = $this->options['ttl'];
+
+            if ($diff <= $ttl) {
+                return true;
+            } else {
+                unset($this->items[$key]);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Adds an item to the storage array
+     *
+     * @param string $key
+     * @param mixed $value
+     */
+    private function internalSetItem(string $key, $value)
+    {
+        $this->items[$key] = $value;
     }
 
     /**
