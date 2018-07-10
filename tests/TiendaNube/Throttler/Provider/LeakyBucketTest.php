@@ -205,7 +205,7 @@ class LeakyBucketTest extends TestCase
     public function testHasLimitForFullBucket()
     {
         $provider = $this->getProviderWithStorage(10);
-        $provider->incrementUsage('foo',11);
+        $provider->incrementUsage('foo',10);
         $this->assertFalse($provider->hasLimit('foo'));
     }
 
