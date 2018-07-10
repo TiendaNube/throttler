@@ -47,9 +47,16 @@ class Throttler
     public function throttle(string $namespace, bool $sleep = false, int $increment = 1): bool
     {
         if ($this->provider->hasLimit($namespace)) {
-            $this->provider->incrementUsage($namespace,$increment);
-            return false;
-        } else if ($sleep) {
+            $limit = $this->provider->getLimit($namespace);
+            $usage = $this->provider->getUsage($namespace);
+
+            if (($usage + $increment) <= $limit) {
+                $this->provider->incrementUsage($namespace,$increment);
+                return false;
+            }
+        }
+
+        if ($sleep) {
             $time = $this->provider->getEstimate($namespace);
             usleep($time * 1000);
 
