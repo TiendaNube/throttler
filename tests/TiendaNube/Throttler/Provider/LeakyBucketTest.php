@@ -70,6 +70,17 @@ class LeakyBucketTest extends TestCase
     }
 
     /**
+     * Should not be able to increment a bucket without a storage.
+     */
+    public function testIncrementBucketWithoutStorage()
+    {
+        $provider = new LeakyBucket();
+
+        $this->expectException(StorageNotDefinedException::class);
+        $provider->incrementUsage('foo');
+    }
+
+    /**
      * Should be able to increment an empty bucket.
      */
     public function testIncrementEmptyBucket()
@@ -106,6 +117,17 @@ class LeakyBucketTest extends TestCase
 
         $this->expectException(LeakyBucketException::class);
         $provider->incrementUsage('foo',1);
+    }
+
+    /**
+     * Should not be able to get the usage without a storage.
+     */
+    public function testGetUsageWithoutStorage()
+    {
+        $provider = new LeakyBucket();
+
+        $this->expectException(StorageNotDefinedException::class);
+        $provider->getUsage('foo');
     }
 
     /**
@@ -147,6 +169,17 @@ class LeakyBucketTest extends TestCase
     }
 
     /**
+     * Should not be able to check for limit without a storage.
+     */
+    public function testHasLimitWithoutStorage()
+    {
+        $provider = new LeakyBucket();
+
+        $this->expectException(StorageNotDefinedException::class);
+        $provider->hasLimit('foo');
+    }
+
+    /**
      * Should be able to check for limit on an empty bucket.
      */
     public function testHasLimitForEmptyBucket()
@@ -177,6 +210,17 @@ class LeakyBucketTest extends TestCase
     }
 
     /**
+     * Should not be able to get the remaining number without a storage.
+     */
+    public function testGetRemainingWithoutStorage()
+    {
+        $provider = new LeakyBucket();
+
+        $this->expectException(StorageNotDefinedException::class);
+        $provider->getRemaining('foo');
+    }
+
+    /**
      * Should be able to get the remaining number from an empty bucket.
      */
     public function testGetRemainingForEmptyBucket()
@@ -193,6 +237,28 @@ class LeakyBucketTest extends TestCase
         $provider = $this->getProviderWithStorage(10);
         $provider->incrementUsage('foo',2);
         $this->assertEquals(8,$provider->getRemaining('foo'));
+    }
+
+    /**
+     * Should be able to get the remaining number from a full bucket.
+     */
+    public function testGetRemainingForFullBucket()
+    {
+        $provider = $this->getProviderWithStorage(10);
+
+        $provider->incrementUsage('foo',10);
+        $this->assertEquals(0,$provider->getRemaining('foo'));
+    }
+
+    /**
+     * Should not be able to get the reset time without a storage.
+     */
+    public function testGetResetWithoutStorage()
+    {
+        $provider = new LeakyBucket();
+
+        $this->expectException(StorageNotDefinedException::class);
+        $provider->getReset('foo');
     }
 
     /**
