@@ -1,5 +1,11 @@
 # Throttler
 
+[![Build Status](https://travis-ci.org/TiendaNube/throttler.svg?branch=master)](https://travis-ci.org/TiendaNube/throttler)
+[![Coverage Status](https://coveralls.io/repos/github/TiendaNube/throttler/badge.svg?branch=master)](https://coveralls.io/github/TiendaNube/throttler?branch=master)
+[![Latest Stable Version](https://poser.pugx.org/tiendanube/throttler/v/stable)](https://packagist.org/packages/tiendanube/throttler)
+[![Total Downloads](https://poser.pugx.org/tiendanube/throttler/downloads)](https://packagist.org/packages/tiendanube/throttler)
+[![License](https://poser.pugx.org/tiendanube/throttler/license)](https://packagist.org/packages/tiendanube/throttler)
+
 This is yet another Throttling library for PHP applications, that provides a throttling interface and a flexible API for implementing custom throttling algorithms (aka providers) and storage strategies.
 
 ## Installation
