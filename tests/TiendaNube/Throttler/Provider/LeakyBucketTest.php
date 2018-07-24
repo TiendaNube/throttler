@@ -251,6 +251,25 @@ class LeakyBucketTest extends TestCase
     }
 
     /**
+     * Should be able to get the estimate as 0 from an empty bucket.
+     */
+    public function testGetEstimateForEmptyBucket()
+    {
+        $provider = $this->getProviderWithStorage();
+        $this->assertEquals(0,$provider->getEstimate('foo'));
+    }
+
+    /**
+     * Should be able to get the estimated time in milliseconds for a full bucket.
+     */
+    public function testGetEstimateForFullBucket()
+    {
+        $provider = $this->getProviderWithStorage(1,1);
+        $provider->incrementUsage('foo');
+        $this->assertEquals(1000,$provider->getEstimate('foo'));
+    }
+
+    /**
      * Should not be able to get the reset time without a storage.
      */
     public function testGetResetWithoutStorage()
