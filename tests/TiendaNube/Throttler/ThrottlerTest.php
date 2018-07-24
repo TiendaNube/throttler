@@ -85,4 +85,124 @@ class ThrottlerTest extends TestCase
         $this->assertFalse($throttler->throttle('foo'));
         $this->assertFalse($throttler->throttle('foo',true));
     }
+
+    /**
+     * Should be able to get the ratio
+     */
+    public function testGetRatio()
+    {
+        $throttler = $this->getThrottlerWithProviderAndStorage();
+        $this->assertEquals(1,$throttler->getRatio('foo'));
+    }
+
+    /**
+     * Should be able to get the usage of an empty storage
+     */
+    public function testGetUsageOfEmptyBucket()
+    {
+        $throttler = $this->getThrottlerWithProviderAndStorage();
+        $this->assertEquals(0,$throttler->getUsage('foo'));
+    }
+
+    /**
+     * Should be able to get the usage of a non-empty storage
+     */
+    public function testGetUsageOfNonEmptyBucket()
+    {
+        $throttler = $this->getThrottlerWithProviderAndStorage();
+        $throttler->throttle('foo');
+        $this->assertNotEquals(0,$throttler->getUsage('foo'));
+    }
+
+    /**
+     * Should be able to get the throttling limit
+     */
+    public function testGetLimit()
+    {
+        $throttler = $this->getThrottlerWithProviderAndStorage(10);
+        $this->assertEquals(10,$throttler->getLimit('foo'));
+    }
+
+    /**
+     * Should be able to check if has limit with available limit
+     */
+    public function testHasLimitWithAvailableLimit()
+    {
+        $throttler = $this->getThrottlerWithProviderAndStorage(10);
+        $this->assertTrue($throttler->hasLimit('foo'));
+        $throttler->throttle('foo');
+        $this->assertTrue($throttler->hasLimit('foo'));
+    }
+
+    /**
+     * Should be able to check if has limit without available limit
+     */
+    public function testHasLimitWithoutAvailableLimit()
+    {
+        $throttler = $this->getThrottlerWithProviderAndStorage(1);
+        $this->assertTrue($throttler->hasLimit('foo'));
+        $throttler->throttle('foo');
+        $this->assertFalse($throttler->hasLimit('foo'));
+    }
+
+    /**
+     * Should be able to get the remaining limit
+     */
+    public function testGetRemaining()
+    {
+        $throttler = $this->getThrottlerWithProviderAndStorage(10);
+        $this->assertEquals(10,$throttler->getRemaining('foo'));
+        $throttler->throttle('foo');
+        $this->assertEquals(9,$throttler->getRemaining('foo'));
+    }
+
+    /**
+     * Should be able to get the estimate with available limit
+     */
+    public function testGetEstimateWithAvailableLimit()
+    {
+        $throttler = $this->getThrottlerWithProviderAndStorage(10,1);
+        $this->assertEquals(0,$throttler->getEstimate('foo'));
+        $throttler->throttle('foo');
+        $this->assertEquals(0,$throttler->getEstimate('foo'));
+    }
+
+    /**
+     * Should be able to get the estimate without available limit
+     */
+    public function testGetEstimateWithoutAvailableLimit()
+    {
+        $throttler = $this->getThrottlerWithProviderAndStorage(1,1);
+        $throttler->throttle('foo');
+        $this->assertEquals(1000,$throttler->getEstimate('foo'));
+    }
+
+    /**
+     * Should be able to get the reset time in milliseconds without throttling
+     */
+    public function testGetResetWithoutThrottling()
+    {
+        $throttler = $this->getThrottlerWithProviderAndStorage();
+        $this->assertEquals(0,$throttler->getReset('foo'));
+    }
+
+    /**
+     * Should be able to get the reset time in milliseconds, throttling with available limit
+     */
+    public function testGetResetWithThrottlingWithAvailableLimit()
+    {
+        $throttler = $this->getThrottlerWithProviderAndStorage(10,1);
+        $throttler->throttle('foo');
+        $this->assertEquals(1000,$throttler->getReset('foo'));
+    }
+
+    /**
+     * Should be able to get the reset time, throttling, without available limit
+     */
+    public function testGetResetWithoutAvailableLimit()
+    {
+        $throttler = $this->getThrottlerWithProviderAndStorage(10,1);
+        $throttler->throttle('foo',false,10);
+        $this->assertEquals(10000,$throttler->getReset('foo'));
+    }
 }
